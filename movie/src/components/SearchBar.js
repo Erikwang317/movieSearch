@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 
-function SearchBar( {onSearch} ) {
+function SearchBar() {
 
     const [query, setQuery] = useState('');
-
-    const handleChange = ( event ) => {
-        setQuery(event.target.value);
-    }
+    const navigate = useNavigate();
 
     const handleSubmit = ( event ) => {
         event.preventDefault();
-        onSearch(query);
+        // onSearch(query);
+        navigate(`/?search=${encodeURIComponent(query)}`);
+    
     }
 
     return (
@@ -19,8 +19,8 @@ function SearchBar( {onSearch} ) {
             <input
                 className='search-input'
                 type = 'text'
-                placeholder = 'Please enter the moive name'
-                onChange = {handleChange}
+                placeholder = 'Enter movie title...'
+                onChange = {(event => setQuery(event.target.value))}
             />
             <button className='search-button' type="submit">
                 Search

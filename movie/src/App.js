@@ -3,33 +3,61 @@ import React, { useEffect, useState } from 'react';
 import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 
 function App() {
   const [movies, setMovies] = useState([]);
   const [hasMore, setHasMore] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const navigate = useNavigate();
+  // const location = useLocation();
 
   useEffect(() => {
-    if(location.state?.searchQuery) {
-      setSearchQuery(location.state.searchQuery);
-      handleSearch(location.state.searchQuery);
+    // console.log(searchParams)
+    const searchQuery = searchParams.get('search');
+    // console.log(searchParams.get('search'))
+    if (searchQuery) {
+      handleSearch(decodeURIComponent(searchQuery));
     }
-    console.log(location.state)
-  },[location.state?.searchQuery]);
+  }, [searchParams]);
 
-  const handleSearch = async (movieTitle) => {
+  const handleSearch = async (movieTitle, page = 1) => {
     const apiKey = '7cb4fd5b';
-    const url = `http://www.omdbapi.com/?apikey=${apiKey}&s=${movieTitle}`;
-
+    if (page === 1) {
+      setCurrentPage(1); 
+      // setMovies([]); 
+    }
+    const url = `http://www.omdbapi.com/?apikey=${apiKey}&s=${encodeURIComponent(movieTitle)}&page=${page}`;
+  
     try {
-      // console.log(url);
       const {data} = await axios.get(url);
-      setMovies(data.Search);
+      if (data.Response === "True") {
+        console.log(data.Search);
+        setMovies(prevMovies => page === 1 ? [...data.Search] : [...prevMovies, ...data.Search]);
+        setTotalResults(parseInt(data.totalResults, 10));
+        setHasMore(movies.length < data.totalResults);
+        console.log(movies);
+        console.log(totalResults);
+        console.log(hasMore);
+      } else {
+        setMovies([]);
+        setHasMore(false);
+      }
     } catch (e) {
-      console.log("Encounter error when fetching data", e)
+      console.error("Encounter error when fetching data", e);
+    }
+  };
+
+  const loadMoreMovies = () => {
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    // console.log(currentPage);
+    const searchQuery = searchParams.get('search');
+    if (searchQuery) {
+      handleSearch(decodeURIComponent(searchQuery), nextPage);
     }
   }
 
@@ -38,10 +66,12 @@ function App() {
     <div className="App">
       <div className="background">
         <div className="content-container">
-          <h1 className='header'>Movie Search</h1>
+          <a href="/">
+            <h1 className='header'>Movie Search</h1>
+          </a>
           <SearchBar onSearch={handleSearch}/>
           <MovieList movies={movies} />
-          {hasMore && <button onClick={() => handleSearch(searchQuery)}>Load More</button>}
+          {hasMore && <button className='load-button' onClick={loadMoreMovies}>Load More</button>}
         </div>
       </div> 
     </div>

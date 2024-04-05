@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import noImage from '../assets/noImage.jpeg';
 
@@ -7,8 +7,18 @@ function MovieDetails () {
     const { movieId } = useParams();
     const navigate = useNavigate();
     const [movieDetails, setMovieDetails] = useState(null);
-    const location = useLocation();
-    const { searchQuery } = location.state || {};
+    const detailKeys = [
+        { key: 'Released', label: 'Released' },
+        { key: 'Runtime', label: 'Runtime' },
+        { key: 'Genre', label: 'Genre' },
+        { key: 'Director', label: 'Director' },
+        { key: 'Actors', label: 'Actors' },
+        { key: 'Writer', label: 'Writer' },
+        { key: 'Language', label: 'Language' },
+        { key: 'Country', label: 'Country' },
+        { key: 'Awards', label: 'Awards' },
+        { key: 'Plot', label: 'Plot' },
+    ];
 
     useEffect(() => {
         const fetchMovieDetails = async () => {
@@ -26,7 +36,7 @@ function MovieDetails () {
     },[movieId]);
 
     return (
-        !movieDetails? <div>Loading ...</div> :
+        !movieDetails ? <div>Loading...</div> :
         <div className='movie-detail'>
             <div className="movie-poster">
                 <img src={movieDetails.Poster !== 'N/A' ? movieDetails.Poster : noImage} alt="No Poster" />
@@ -36,22 +46,17 @@ function MovieDetails () {
                 {movieDetails.Ratings && movieDetails.Ratings.map((rating, index) => (
                     <p key={index}><strong>{rating.Source}:</strong> {rating.Value}</p>
                 ))}
-                <p><strong>Released:</strong> {movieDetails.Released}</p>
-                <p><strong>Runtime:</strong> {movieDetails.Runtime}</p>
-                <p><strong>Genre:</strong> {movieDetails.Genre}</p>
-                <p><strong>Director:</strong> {movieDetails.Director}</p>
-                <p><strong>Actors:</strong> {movieDetails.Actors}</p>
-                <p><strong>Writer:</strong> {movieDetails.Writer}</p>
-                <p><strong>Language:</strong> {movieDetails.Language}</p>
-                <p><strong>Country:</strong> {movieDetails.Country}</p>
-                <p><strong>Awards:</strong> {movieDetails.Awards}</p>
-                <p><strong>Plot:</strong> {movieDetails.Plot}</p>
-                <button className='back-button' onClick={() => navigate('/', {state: {searchQuery}})}>Back</button>
+                {detailKeys.map(({key, label}) => ( 
+                    movieDetails[key]?
+                    <p key={key}>
+                        <strong>{label}:</strong> {movieDetails[key]}
+                    </p> : null
+                ))}
+                <button className='back-button' onClick={() => navigate(-1)}>Back</button>
             </div>
             
         </div>
     )
-
 }
 
 export default MovieDetails

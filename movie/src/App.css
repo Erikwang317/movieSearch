@@ -1,6 +1,6 @@
 .background {
   position: relative;
-  min-height: 100vh; 
+  max-height: 100vh; 
   overflow: auto; 
   padding: 5% 10%;
 }
@@ -94,6 +94,10 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
   transition: transform 0.2s ease-in-out;
   height: 300px;
+  h3, h4 {
+    color: #f9f9f9;
+    text-shadow: 2px 2px 5px #282c34;
+  }
 }
 
 .movie-item:hover {
@@ -167,7 +171,7 @@
   z-index: -1;
 }
 
-.back-button {
+.back-button, .load-button {
   padding: 0.5rem 1rem;
   font-size: 1rem;
   background-color: #666; 
@@ -177,4 +181,7 @@
   cursor: pointer;
 }
 
+a {
+  text-decoration: none;
+}
 
