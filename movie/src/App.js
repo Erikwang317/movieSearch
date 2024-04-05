@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
 import axios from 'axios';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 
 function App() {
@@ -12,7 +12,8 @@ function App() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const navigate = useNavigate();
+  const [searchPerformed, setSearchPerformed] = useState(false);
+  // const navigate = useNavigate();
   // const location = useLocation();
 
   useEffect(() => {
@@ -25,6 +26,7 @@ function App() {
   }, [searchParams]);
 
   const handleSearch = async (movieTitle, page = 1) => {
+    setSearchPerformed(true);
     const apiKey = '7cb4fd5b';
     if (page === 1) {
       setCurrentPage(1); 
@@ -34,7 +36,7 @@ function App() {
   
     try {
       const {data} = await axios.get(url);
-      if (data.Response === "True") {
+      if (data.Response === "True") { 
         console.log(data.Search);
         setMovies(prevMovies => page === 1 ? [...data.Search] : [...prevMovies, ...data.Search]);
         setTotalResults(parseInt(data.totalResults, 10));
@@ -70,7 +72,7 @@ function App() {
             <h1 className='header'>Movie Search</h1>
           </a>
           <SearchBar onSearch={handleSearch}/>
-          <MovieList movies={movies} />
+          <MovieList movies={movies} searchPerformed={searchPerformed}/>
           {hasMore && <button className='load-button' onClick={loadMoreMovies}>Load More</button>}
         </div>
       </div> 
